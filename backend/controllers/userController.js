@@ -85,21 +85,21 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 
   //USER EXITS, CHECK IF PASSWORD IS CORRECT
-  const passwordIsCorrect = await bcrypt.compare(password, user.password)
+  const passwordIsCorrect = await bcrypt.compare(password, user.password);
 
-   //GENERATE TOKEN
-   const token = generateToken(user._id);
+  //GENERATE TOKEN
+  const token = generateToken(user._id);
 
-   // SEBD HTTP-ONLY COOKIE
-   res.cookie("token", token, {
-     path: "/",
-     httpOnly: true,
-     expires: new Date(Date.now() + 1000 * 86400), // 1day
-     sameSite: "none",
-     secure: true,
-   });
+  // SEBD HTTP-ONLY COOKIE
+  res.cookie("token", token, {
+    path: "/",
+    httpOnly: true,
+    expires: new Date(Date.now() + 1000 * 86400), // 1day
+    sameSite: "none",
+    secure: true,
+  });
 
-  if(user && passwordIsCorrect) {
+  if (user && passwordIsCorrect) {
     const { _id, name, email, photo, phone, bio } = user;
 
     res.status(200).json({
@@ -116,7 +116,22 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 });
 
+//LOGOUT USER
+const logout = asyncHandler(async (req, res) => {
+  res.cookie("token",'', {
+    path: "/",
+    httpOnly: true,
+    expires: new Date(0), 
+    sameSite: "none",
+    secure: true,
+  });
+
+  return res.status(200).json({message: 'successfully logged out'})
+
+});
+
 module.exports = {
   registerUser,
   loginUser,
+  logout,
 };
