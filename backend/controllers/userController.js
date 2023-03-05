@@ -1,7 +1,7 @@
-const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
-const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1d" });
@@ -118,20 +118,40 @@ const loginUser = asyncHandler(async (req, res) => {
 
 //LOGOUT USER
 const logout = asyncHandler(async (req, res) => {
-  res.cookie("token",'', {
+  res.cookie("token", "", {
     path: "/",
     httpOnly: true,
-    expires: new Date(0), 
+    expires: new Date(0),
     sameSite: "none",
     secure: true,
   });
 
-  return res.status(200).json({message: 'successfully logged out'})
+  return res.status(200).json({ message: "successfully logged out" });
+});
 
+const getUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id)
+
+  if (user) {
+    const { _id, name, email, photo, phone, bio } = user;
+
+    res.status(200).json({
+      _id,
+      name,
+      email,
+      photo,
+      phone,
+      bio,
+    });
+  } else {
+    res.status(400);
+    throw new Error("User not found");
+  }
 });
 
 module.exports = {
   registerUser,
   loginUser,
   logout,
+  getUser
 };
