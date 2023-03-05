@@ -1,3 +1,4 @@
+const bcrypt = require("bcrypt");
 const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
@@ -6,6 +7,7 @@ const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1d" });
 };
 
+// REGISTER USER
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -65,6 +67,56 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 });
 
+// LOGIN USER
+const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  //VALIDATE REQUEST
+  if (!email || !password) {
+    res.status(400);
+    throw new Error("Please add email and password");
+  }
+
+  //check if user exists
+  const user = await User.findOne({ email });
+  if (!user) {
+    res.status(400);
+    throw new Error("User not found. Please sign up");
+  }
+
+  //USER EXITS, CHECK IF PASSWORD IS CORRECT
+  const passwordIsCorrect = await bcrypt.compare(password, user.password)
+
+   //GENERATE TOKEN
+   const token = generateToken(user._id);
+
+   // SEBD HTTP-ONLY COOKIE
+   res.cookie("token", token, {
+     path: "/",
+     httpOnly: true,
+     expires: new Date(Date.now() + 1000 * 86400), // 1day
+     sameSite: "none",
+     secure: true,
+   });
+
+  if(user && passwordIsCorrect) {
+    const { _id, name, email, photo, phone, bio } = user;
+
+    res.status(200).json({
+      _id,
+      name,
+      email,
+      photo,
+      phone,
+      bio,
+    });
+  } else {
+    res.status(400);
+    throw new Error("Invalid user data");
+  }
+});
+
 module.exports = {
   registerUser,
+  loginUser,
 };
