@@ -9,6 +9,7 @@ import Reset from "./pages/Auth/Reset";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Home from "./pages/Home/Home";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 axios.defaults.withCredentials = true;
 

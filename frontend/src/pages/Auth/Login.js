@@ -50,6 +50,7 @@ const Login = () => {
       navigate("/dashboard");
       setIsLoading(false);
     } catch (error) {
+      console.log("🚀 ~ file: Login.js:53 ~ login ~ error:", error)
       setIsLoading(false);
     }
   };

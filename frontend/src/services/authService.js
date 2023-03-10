@@ -33,15 +33,21 @@ export const registerUser = async (userData) => {
 // Login User
 export const loginUser = async (userData) => {
   try {
+    let url = `${BACKEND_URL}/api/users/login`;
+    console.log('***url', url)
+    console.log('***userData', userData)
+
     const response = await axios.post(
-      `${BACKEND_URL}/api/users/login`,
+      url,
       userData
     );
+    console.log('***response', response)
     if (response.statusText === "OK") {
       toast.success("Login Successful...");
     }
     return response.data;
   } catch (error) {
+    console.log('***error', error)
     const message =
       (error.response && error.response.data && error.response.data.message) ||
       error.message ||
