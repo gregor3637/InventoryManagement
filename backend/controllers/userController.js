@@ -74,8 +74,6 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  console.log('**** loginUser 1')
-
   //VALIDATE REQUEST
   if (!email || !password) {
     res.status(400);
@@ -83,19 +81,12 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 
   //check if user exists
-  console.log('**** loginUser 1.1')
   const user = await User.findOne({ email });
-  console.log('**** loginUser 1.2')
   if (!user) {
     res.status(400);
-    console.log('**** loginUser 1.3')
-    console.log('**** loginUser 1.4.1')
     throw new Error("User not found. Please sign up");
-    console.log('**** loginUser 1.4.2')
   }
-  console.log('**** loginUser 1.4')
 
-  console.log('**** loginUser 2')
   //USER EXITS, CHECK IF PASSWORD IS CORRECT
   const passwordIsCorrect = await bcrypt.compare(password, user.password);
 
@@ -110,7 +101,6 @@ const loginUser = asyncHandler(async (req, res) => {
     sameSite: "none",
     secure: true,
   });
-  console.log('**** loginUser 3')
 
   if (user && passwordIsCorrect) {
     const { _id, name, email, photo, phone, bio } = user;
